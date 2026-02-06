@@ -14,15 +14,17 @@ let project = Project(
             bundleId: "com.bambooLocal.EventProcessor",
             deploymentTargets: .macOS("14.0"),
             infoPlist: .default,
-            sources: ["EventProcessor/**"],
-            resources: [
-                "EventProcessor/Resources/**"
+            sources: [
+                "EventProcessor/App/**",
+                "EventProcessor/Core/**",
+                "EventProcessor/Features/**",
             ],
+            resources: ["EventProcessor/Resources/**"],
             dependencies: [
                 .package(product: "SQLite"),
                 .package(product: "FirebaseCore"),
                 .package(product: "FirebaseFirestore"),
-                .xcframework(path: "llama.xcframework")
+                .xcframework(path: "build-apple/llama.xcframework")
             ],
             settings: .settings(
                 base: [
