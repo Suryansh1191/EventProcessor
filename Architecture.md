@@ -99,18 +99,18 @@ flowchart TD
     end
 
     subgraph Core_LLM[Core · LLM]
-        LLMR[LlamaCppRunner<br/>(LLMInferenceProtocol)]
+        LLMR[LlamaCppRunner (LLMInferenceProtocol)]
     end
 
     subgraph Core_Logger[Core · Logger]
         LSYNC[LogSyncManager]
-        UPLOADER[LogUploaderProtocol<br/>(e.g. FirestoreManager)]
+        UPLOADER[LogUploaderProtocol (e.g. FirestoreManager)]
     end
 
     HV -->|binds @Published| HVM
 
     %% Event generation path
-    HVM -->|Timer every 1s<br/>getLog()| HVM
+    HVM -->|Timer every 1s, getLog()| HVM
     HVM -->|log(LogEntry)| LDBS
     LDBS -->|periodic flush| LSQL
 
@@ -126,7 +126,7 @@ flowchart TD
     LSYNC -->|upload(events)| UPLOADER
 
     %% UI reflection
-    HVM -->|@Published<br/>resentEvent,<br/>resentLLMOutput,<br/>processingLogs| HV
+    HVM -->|@Published resentEvent, resentLLMOutput, processingLogs| HV
 ```
 
 ### Narrative summary
@@ -143,4 +143,53 @@ flowchart TD
    - A status indicator driven by `processingLogs`.
 
 This architecture keeps the UI thin, isolates I/O and LLM work off the main thread, and routes all event and metadata flows through well-defined core services.
+
+---
+
+## File Structure (high level)
+
+```text
+EventProcessor/
+├─ EventProcessor/
+│  ├─ App/
+│  │  ├─ AppDelegate.swift
+│  │  ├─ AppCoordinator.swift
+│  │  ├─ RootView.swift
+│  │  └─ DependencyContainer.swift
+│  ├─ Core/
+│  │  ├─ Config/
+│  │  │  └─ SystemConstants.swift
+│  │  ├─ DB/
+│  │  │  └─ Logs/
+│  │  │     ├─ LogDBProtocol.swift
+│  │  │     ├─ LogSQLiteDB.swift
+│  │  │     ├─ LogDBService.swift
+│  │  │     └─ LogModel.swift
+│  │  ├─ Logger/
+│  │  │  ├─ LogSyncManager.swift
+│  │  │  └─ LogUploaderProtocol.swift
+│  │  └─ LLMInference/
+│  │     ├─ LLMInferenceProtocol.swift
+│  │     ├─ LLMConstants.swift
+│  │     └─ LlamaCppRunner.swift
+│  ├─ Features/
+│  │  └─ HomeView/
+│  │     ├─ HomeView.swift
+│  │     └─ HomeViewModel.swift
+│  ├─ Resources/
+│  │  └─ GoogleService-Info.plist
+│  └─ Tests/
+│     ├─ EventProcessor_Tests.swift
+│     └─ LogDBServiceTests.swift
+├─ Tuist/
+│  └─ Package.swift
+├─ .github/
+│  └─ workflows/
+│     └─ ci.yml
+├─ Project.swift
+├─ README.md
+├─ Architecture.md
+├─ TestCase.md
+└─ Security.md
+```
 
