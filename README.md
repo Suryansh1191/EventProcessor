@@ -10,6 +10,7 @@ macOS app that processes and stores events, and can generate LLM output from the
 
 ### Generate the Xcode project
 ```bash
+swift DownloadAssets.swift 
 tuist install
 tuist generate
 open EventProcessor.xcodeproj
