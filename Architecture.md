@@ -88,45 +88,50 @@ This separation keeps UI, persistence, logging/sync, and LLM concerns decoupled 
 
 ```mermaid
 flowchart TD
+    %% UI
     subgraph UI
         HV[HomeView]
         HVM[HomeViewModel]
     end
 
-    subgraph Core_DB[Core · DB]
+    %% Core DB
+    subgraph Core_DB
         LDBS[LogDBService]
         LSQL[LogSQLite]
     end
 
-    subgraph Core_LLM[Core · LLM]
-        LLMR[LlamaCppRunner (LLMInferenceProtocol)]
+    %% Core LLM
+    subgraph Core_LLM
+        LLMR[LlamaCppRunner_LLMInference]
     end
 
-    subgraph Core_Logger[Core · Logger]
+    %% Core Logger
+    subgraph Core_Logger
         LSYNC[LogSyncManager]
-        UPLOADER[LogUploaderProtocol (e.g. FirestoreManager)]
+        UPLOADER[LogUploaderProtocol_Firestore]
     end
 
-    HV -->|binds @Published| HVM
+    %% UI Binding
+    HV --> HVM
 
-    %% Event generation path
-    HVM -->|Timer every 1s, getLog()| HVM
-    HVM -->|log(LogEntry)| LDBS
-    LDBS -->|periodic flush| LSQL
+    %% Event Generation
+    HVM -->|log event| LDBS
+    LDBS -->|flush| LSQL
 
-    %% LLM processing path
-    HVM -->|collect logs batch| HVM
-    HVM -->|process(LogEntry)| LLMR
-    LLMR -->|Async tokens| HVM
-    HVM -->|update metaString| LDBS
+    %% LLM Processing
+    HVM -->|batch logs| LLMR
+    LLMR -->|async tokens| HVM
+    HVM -->|update meta| LDBS
 
-    %% Sync path
-    LSYNC -->|getEvents(start,end)| LDBS
-    LDBS -->|query DB| LSQL
-    LSYNC -->|upload(events)| UPLOADER
+    %% Sync
+    LSYNC -->|get events| LDBS
+    LDBS -->|query| LSQL
+    LSYNC -->|upload| UPLOADER
 
-    %% UI reflection
-    HVM -->|@Published resentEvent, resentLLMOutput, processingLogs| HV
+    %% UI Updates
+    HVM -->|recentEvent| HV
+    HVM -->|recentLLMOutput| HV
+    HVM -->|processingLogs| HV
 ```
 
 ### Narrative summary
