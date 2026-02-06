@@ -14,10 +14,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Tuist (brew, as in README)
+      - name: Install Tuist 
         run: |
           brew update
           brew install tuist
+
+      - name: Download llama.cpp and LLM model
+        run: |
+          swift DownloadAssets.swift
 
       - name: Generate Xcode project (tuist install + generate)
         run: |
