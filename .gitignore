@@ -21,4 +21,21 @@ playground.xcworkspace
 *.xcframework
 *.DS_Store
 
+# Tuist
+# Ignore the generated Xcode projects and workspaces
+*.xcodeproj
+*.xcworkspace
+
+# Ignore the Tuist derived data and cache
+.tuist-bin/
+Derived/
+.build/
+Tuist/Dependencies/
+Tuist/.build/
+
+# Standard macOS/Xcode ignores
+DerivedData/
+*.moved-aside
+*.xcuserstate
+
 .build/
